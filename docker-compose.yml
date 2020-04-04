@@ -67,42 +67,50 @@ services:
       - elasticsearch
 
   app:
-    build : ./app
-    volumes:
-      - ./app/:/usr/src/app
-      - /usr/src/app/node_modules/ # make node_module empty in container
-    command: npm start
-    ports:
-      - "3000:3000"
-    networks:
-      - elk
+    image: docker-logs-elk/dummy-app:1.0.0
+    build:
+      context: dummy-app/
+      dockerfile: Dockerfile
 
-  nginx:
-    build: ./nginx
-    volumes:
-      - ./nginx/config/conf.d:/etc/nginx/conf.d
-      - ./nginx/log:/var/log/nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    links:
-      - app:app
-    depends_on: 
-      - app
-    networks:
-      - elk
+  # app:
+  #   build : ./app
+  #   volumes:
+  #     - ./app/:/usr/src/app
+  #     - /usr/src/app/node_modules/ # make node_module empty in container
+  #   command: npm start
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - elk
+
+  # nginx:
+  #   build: ./nginx
+  #   volumes:
+  #     - ./nginx/config/conf.d:/etc/nginx/conf.d
+  #     - ./nginx/log:/var/log/nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   links:
+  #     - app:app
+  #   depends_on: 
+  #     - app
+  #   networks:
+  #     - elk
 
   filebeat:
     build: ./filebeat
     entrypoint: "filebeat -e -strict.perms=false"
     volumes:
-      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./nginx/log:/var/log/nginx
+      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml #Moved to Dockerfile
+      - "/var/lib/docker/containers:/usr/share/dockerlogs/data:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # - ./nginx/log:/var/log/nginx
     networks:
       - elk
     depends_on: 
       - app
-      - nginx
+      # - nginx
       - logstash
       - elasticsearch
       - kibana
