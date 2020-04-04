@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx-app
+    container_name: nginx-server
+    build: ./nginx
+    ports:
+      - 8080:8080
+  
