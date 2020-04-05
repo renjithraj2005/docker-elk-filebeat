@@ -66,22 +66,22 @@ services:
     depends_on:
       - elasticsearch
 
-  app:
-    image: docker-logs-elk/dummy-app:1.0.0
-    build:
-      context: dummy-app/
-      dockerfile: Dockerfile
-
   # app:
-  #   build : ./app
-  #   volumes:
-  #     - ./app/:/usr/src/app
-  #     - /usr/src/app/node_modules/ # make node_module empty in container
-  #   command: npm start
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - elk
+  #   image: docker-logs-elk/dummy-app:1.0.0
+  #   build:
+  #     context: dummy-app/
+  #     dockerfile: Dockerfile
+
+  app:
+    build : ./app
+    volumes:
+      - ./app/:/usr/src/app
+      - /usr/src/app/node_modules/ # make node_module empty in container
+    command: npm start
+    ports:
+      - "3000:3000"
+    networks:
+      - elk
 
   # nginx:
   #   build: ./nginx
